@@ -17,3 +17,11 @@ export const BtnWrap = styled.div`
     }
   }
 `
+
+export const PageWrap = styled.div`
+  padding: 40px 0;
+  text-align: center;
+  .rc-pagination {
+    display: inline-block;
+  }
+`

@@ -20,8 +20,11 @@ export const Menu = styled.ul`
     font-size: 14px;
     font-weight: bold;
     vertical-align: middle;
-    a:hover {
+    a.selected {
       color: gray;
+    }
+    span {
+      font-size: 12px;
     }
   }
 `

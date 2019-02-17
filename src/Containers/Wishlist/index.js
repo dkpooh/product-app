@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Controller from '../Controller.js';
-import { Content, Title, Table } from '../styled';
+import _ from 'lodash';
+import { Content, Title, Table, Tag } from '../styled.js';
+import { Total, Box, Coupon, Price } from './styled.js';
 
-const WishList = ({ wishItems }) => {
-  console.log(wishItems);
+const WishList = ({
+  wishItems, coupons, selectedWishItems, isChecked,
+  onChangeCheck,
+}) => {
   return (
     <Content>
       <Title>장바구니</Title>
@@ -25,25 +29,58 @@ const WishList = ({ wishItems }) => {
           </tr>
         </thead>
         <tbody>
-          {wishItems || wishItems.legnth > 0 ? wishItems.map((item, index) => {
-            return (
-              <tr key={index}>
-                <td><input type="checkbox" /></td>
-                <td>{item.title}</td>
-                <td><img src={item.coverImage} width="100%" /></td>
-                <td></td>
-                <td>{item.price}</td>
-              </tr>
-            )
-          }) : (
+          {_.isEmpty(wishItems) ? (
             <tr>
               <td colSpan="5">장바구니가 비었습니다.</td>
             </tr>
+          ) : (
+            wishItems.map((item, index) => {
+              return (
+                <tr key={index}>
+                  <td><input type="checkbox" value={item.id} checked={item.isChecked} onChange={(e) => {onChangeCheck(e, index)}} /></td>
+                  <td>{item.title}</td>
+                  <td><img src={item.coverImage} width="100%" /></td>
+                  <td><input type="number" min="1" /></td>
+                  <td>
+                    {item.availableCoupon === false ? ( 
+                      <div>
+                        <Tag>쿠폰가능</Tag>
+                        <span>{item.price}</span>
+                      </div> 
+                    ) : ( 
+                      <span>{item.price}</span>
+                    )}
+                  </td>
+                </tr>
+              )
+            })
           )}
         </tbody>
       </Table>
+      <Total> 
+        <Box>
+          <Coupon>
+            <h3>쿠폰</h3>
+            <div>
+              <select>
+                {coupons.map((item, index) => {
+                  return <option key={index}>{item.title}</option>
+                })}
+              </select>
+            </div>
+          </Coupon>
+        </Box>
+        <Box>
+          <Price>
+            <h3>결제금액</h3>
+            <p>총 {selectedWishItems.length}개 상품</p>
+          </Price>
+        </Box>
+      </Total>
     </Content>
   )
 }
 
 export default Controller(WishList);
+
+

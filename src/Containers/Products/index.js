@@ -1,9 +1,15 @@
 import React from 'react';
+import _ from 'lodash';
 import Controller from '../Controller.js';
-import { Content, Title, Table } from '../styled.js';
-import { BtnWrap } from './styled.js';
+import { Content, Title, Table, Tag } from '../styled.js';
+import { BtnWrap, PageWrap } from './styled.js';
+import Pagination from 'rc-pagination';
+import 'rc-pagination/assets/index.css';
 
-const Products = ({ items, addWishList, removeWishList }) => {
+const Products = ({ 
+  current, items, currentItems, wishItems, 
+  addWishList, removeWishList, onChangePage
+}) => {
   return (
     <Content>
       <Title>상품 리스트</Title>
@@ -23,16 +29,29 @@ const Products = ({ items, addWishList, removeWishList }) => {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => {
+          {currentItems.map((item, index) => {
+            const isIncludes = _.filter(wishItems, (i) => { return (i.id === item.id);}).length > 0;
             return (
               <tr key={index}>
                 <td>{item.title}</td>
                 <td><img src={item.coverImage} width="100%" /></td>
-                <td>{item.price}</td>
+                <td>
+                  {item.availableCoupon === false ? ( 
+                    <div>
+                      <Tag>쿠폰가능</Tag>
+                      <span>{item.price}</span>
+                    </div> 
+                  ) : ( 
+                    <span>{item.price}</span>
+                  )}
+                </td>
                 <td>
                   <BtnWrap>
-                    <button onClick={(e) => addWishList(e, item)}>담기</button>
-                    <button onClick={(e) => removeWishList(e, item)}>빼기</button>
+                    {isIncludes ? ( 
+                        <button onClick={(e) => removeWishList(e, item)}>빼기</button> 
+                      ) : ( 
+                        <button onClick={(e) => addWishList(e, item)}>담기</button>
+                    )}
                   </BtnWrap>
                 </td>
               </tr>
@@ -40,6 +59,9 @@ const Products = ({ items, addWishList, removeWishList }) => {
           })}
         </tbody>
       </Table>
+      <PageWrap>
+        <Pagination onChange={onChangePage} pageSize={5} current={current} total={13} />
+      </PageWrap>
     </Content>
   )
 }

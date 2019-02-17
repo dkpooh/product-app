@@ -35,6 +35,10 @@ const GlobalStyle = createGlobalStyle`
     list-style: none;
   }
 
+  li:focus {
+    outline: none;
+  }
+
   table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -42,8 +46,9 @@ const GlobalStyle = createGlobalStyle`
 	
 	a {
 		text-decoration: none;
-		outline: none;
+    outline: none;
   }
+  
   button {
     padding: 0;
     background-color: transparent;
@@ -52,6 +57,8 @@ const GlobalStyle = createGlobalStyle`
       cursor: pointer;
     }
   }
+
+  *:focus { outline: none; }
 `
 
 ReactDOM.render(

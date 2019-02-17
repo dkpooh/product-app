@@ -1,22 +1,21 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Wrap, Menu } from './styled';
+import { NavLink } from 'react-router-dom';
+import Controller from '../../Containers/Controller.js';
+import { Wrap, Menu } from './styled.js';
 import cart from './cart.svg'
 
-class Header extends Component {
-  render () {
-    return (
-      <Wrap>
+const Header = ({ wishItemsCouter }) => {
+  return (
+    <Wrap>
         <div>
           <Menu>
-            <li><Link to="/">HOME</Link></li>
-            <li><Link to="/products">PRODUCTS</Link></li>
-            <li><Link to="/wishlist"><img src={cart} /></Link></li>
+            <li><NavLink activeClassName="selected" exact to="/">HOME</NavLink></li>
+            <li><NavLink activeClassName="selected" exact to="/products">PRODUCTS</NavLink></li>
+            <li><NavLink activeClassName="selected" exact to="/wishlist"><img src={cart} /></NavLink></li>
           </Menu>
         </div>
-      </Wrap>
-    )
-  }
+    </Wrap>
+  )
 }
 
-export default Header
+export default Controller(Header);

@@ -24,3 +24,11 @@ export const Table = styled.table`
     text-align: center;
   }
 `
+
+export const Tag = styled.span`
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #fff;
+  border-radius: 4px;
+  background-color: rgb(255, 85, 0);
+`

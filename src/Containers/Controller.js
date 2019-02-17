@@ -6,6 +6,7 @@ const Controller = WrappedComponent => class extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      current: 1,
       items: [
         {
           id: 'pHr0phFtcWhsgZhSVe9F',
@@ -28,7 +29,6 @@ const Controller = WrappedComponent => class extends Component {
           coverImage: 'https://cdn.class101.net/images/ec0f0c15-aeec-43a3-a0c9-b649b0999f0a',
           price: 320000,
           score: 300,
-      
         },
         {
           id: 'ZXV8mCcvbpXKm5J5snUq',
@@ -36,7 +36,6 @@ const Controller = WrappedComponent => class extends Component {
           coverImage: 'https://cdn.class101.net/images/a363a069-5aaf-40cb-822e-a2cab585c37e',
           price: 240000,
           score: 350,
-      
         },
         {
           id: "tpP45lSwqf1X1yEEFqL4",
@@ -105,6 +104,7 @@ const Controller = WrappedComponent => class extends Component {
           score: 220,
         }
       ],
+      currentItems: [],
       coupons: [
         {
           type: 'rate',
@@ -118,31 +118,86 @@ const Controller = WrappedComponent => class extends Component {
         }
       ],
       wishItems: JSON.parse(localStorage.getItem("wishItems")) || [],
+      selectedWishItems: [],
     };
   }
   componentDidMount() {
-    const newItems =_.slice(_.reverse(_.sortBy(this.state.items, [(i) => { return i.score; }])), [0], [5]);
+    const newItems =_.reverse(_.sortBy(this.state.items, [(i) => { return i.score; }]));    
     this.setState({
       items: update(this.state.items, {$set: newItems}),
+    }, () => {
+      this.onChangePage(this.state.current);
     });
   }
+
   addWishList = (e, item) => {
-    const wishItems = update(this.state.wishItems, {$push: [item]});
+    if (this.state.wishItems.length === 3) {
+      alert("장바구니는 최대 3개만 담을 수 있어요!!");
+      return;
+    }
+    const isIncludes = _.filter(this.state.wishItems, (i) => { return (i.id === item.id);}).length > 0;
+    if (!isIncludes) {
+      const wishItems = update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true})]});
+      console.log(wishItems);
+      localStorage.setItem("wishItems", JSON.stringify(wishItems));
+      this.setState({
+        wishItems: update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true})]}),
+      }) 
+    }
+    // if (isIncludes) {
+    //   localStorage.setItem("wishItems", JSON.stringify(this.state.wishItems));
+    //   this.setState({
+    //     wishItems: update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true})]}),
+    //   })
+    // } else {
+   
+    // }
+  }
+
+  removeWishList = (e, item) => {
+    const index = (_.findIndex(this.state.wishItems, (i) => { return i.id === item.id; }));
+    const wishItems = update(this.state.wishItems, {$splice: [[index, 1]]});
     localStorage.setItem("wishItems", JSON.stringify(wishItems));
     this.setState({
-      wishItems: update(this.state.wishItems, {$push: [item]}),
-    })
+      wishItems: update(this.state.wishItems, {$splice: [[index, 1]]}),
+    }) 
   }
-  removeWishList = (e, item) => {
-    console.log(item);
+
+  onChangePage = (page) => {
+    this.setState({
+      current: page,
+      currentItems: update(this.state.currentItems, {$set: _.slice(this.state.items, [(page - 1) * 5], [page * 5])}),
+    });
   }
+
+  onChangeCheck = (e, idx) => {
+    // if (this.state.wishItems[idx].id === e.target.value) {
+    //   console.log(e.target.checked);
+    //   if (e.target.checked === true) {
+
+    //   } else {
+    //   }
+    // }
+    // const value = target.checked;
+    // const name = target.name;
+    // console.log([name]);
+    //   this.setState({
+    //     [name]: value,
+    //   });
+    // this.setState({
+    //   selectedWishItems: update(this.state.selectedWishItems, {$push: [this.state.wishItems[idx]]}),
+    // })
+  }
+
   render() {
     return (
       <WrappedComponent
         {...this.state}
         {...this.props}
         addWishList={this.addWishList}
-        removeWishList={this.addWishList}
+        removeWishList={this.removeWishList}
+        onChangePage={this.onChangePage}
+        onChangeCheck={this.onChangeCheck}
       />
     ) 
   }
