@@ -1,34 +1,27 @@
 import styled from 'styled-components';
 
 export const Total = styled.div`
-  &:after {
-    display: block;
-    content: '';
-    clear: both;
-  }
-`
-
-export const Box = styled.div`
-  float: left;
-  width: 520px;
   padding: 20px 0;
-  box-sizing: border-box;
-  &:first-child {
-    margin-right: 40px;
-  }
+  text-align: right;
   h3 {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #666;
+    display: inline-block;
+    padding-right: 20px;
   }
-`
-
-export const Coupon = styled.div`
-  select {
-    height: 30px;
+  span {
+    strong {
+      font-weight: normal;
+      color: blue;
+    }
   }
 `
 
 export const Price = styled.div`
 
+`
+
+export const SalePrice = styled.p`
+  font-size: 13px;
+  span {
+    color: red;
+  }
 `

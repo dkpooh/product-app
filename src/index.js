@@ -48,7 +48,7 @@ const GlobalStyle = createGlobalStyle`
 		text-decoration: none;
     outline: none;
   }
-  
+
   button {
     padding: 0;
     background-color: transparent;

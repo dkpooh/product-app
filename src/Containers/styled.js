@@ -22,6 +22,13 @@ export const Table = styled.table`
   td {
     padding: 10px;
     text-align: center;
+    input[type="number"] {
+      width: 50px;
+      height: 25px;
+    }
+    select {
+      height: 35px;
+    }
   }
 `
 

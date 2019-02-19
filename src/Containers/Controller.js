@@ -137,21 +137,12 @@ const Controller = WrappedComponent => class extends Component {
     }
     const isIncludes = _.filter(this.state.wishItems, (i) => { return (i.id === item.id);}).length > 0;
     if (!isIncludes) {
-      const wishItems = update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true})]});
-      console.log(wishItems);
+      const wishItems = update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true, quantity: 1, type: ''})]});
       localStorage.setItem("wishItems", JSON.stringify(wishItems));
       this.setState({
-        wishItems: update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true})]}),
-      }) 
+        wishItems: update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true, quantity: 1, type: ''})]}),
+      })
     }
-    // if (isIncludes) {
-    //   localStorage.setItem("wishItems", JSON.stringify(this.state.wishItems));
-    //   this.setState({
-    //     wishItems: update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true})]}),
-    //   })
-    // } else {
-   
-    // }
   }
 
   removeWishList = (e, item) => {
@@ -170,25 +161,41 @@ const Controller = WrappedComponent => class extends Component {
     });
   }
 
-  onChangeCheck = (e, idx) => {
-    // if (this.state.wishItems[idx].id === e.target.value) {
-    //   console.log(e.target.checked);
-    //   if (e.target.checked === true) {
-
-    //   } else {
-    //   }
-    // }
-    // const value = target.checked;
-    // const name = target.name;
-    // console.log([name]);
-    //   this.setState({
-    //     [name]: value,
-    //   });
-    // this.setState({
-    //   selectedWishItems: update(this.state.selectedWishItems, {$push: [this.state.wishItems[idx]]}),
-    // })
+  onChangeCheckAll = (e) => {
+    let wishItems = this.state.wishItems;
+    wishItems.forEach(item => item.isChecked = e.target.checked) 
+    this.setState({ 
+      wishItems: wishItems 
+    });
   }
 
+  onChangeCheck = (e, idx) => {
+    const target = e.target;
+    if (this.state.wishItems[idx].id === target.value) {
+      this.setState({
+        wishItems: update(this.state.wishItems, {[idx]: {isChecked: {$set: target.checked}}})
+      })
+    }
+  }
+
+  onChangeCoupon = (e, idx) => {
+    const target = e.target;
+    if (this.state.wishItems[idx].id === target.id) {
+      this.setState({
+        wishItems: update(this.state.wishItems, {[idx]: {type: {$set: target.value}}})
+      })
+    }
+  }
+
+  onChagneQuantity = (e, idx) => {
+    const target = e.target;
+    if (this.state.wishItems[idx].id === target.id) {
+      this.setState({
+        wishItems: update(this.state.wishItems, {[idx]: {quantity: {$set: target.value}}})
+      })
+    }
+  }
+  
   render() {
     return (
       <WrappedComponent
@@ -197,7 +204,10 @@ const Controller = WrappedComponent => class extends Component {
         addWishList={this.addWishList}
         removeWishList={this.removeWishList}
         onChangePage={this.onChangePage}
+        onChangeCheckAll={this.onChangeCheckAll}
         onChangeCheck={this.onChangeCheck}
+        onChagneQuantity={this.onChagneQuantity}
+        onChangeCoupon={this.onChangeCoupon}
       />
     ) 
   }

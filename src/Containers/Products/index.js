@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Controller from '../Controller.js';
 import { Content, Title, Table, Tag } from '../styled.js';
 import { BtnWrap, PageWrap } from './styled.js';
+import { addComma } from '../utils.js';
 import Pagination from 'rc-pagination';
 import 'rc-pagination/assets/index.css';
 
@@ -37,12 +38,12 @@ const Products = ({
                 <td><img src={item.coverImage} width="100%" /></td>
                 <td>
                   {item.availableCoupon === false ? ( 
+                    <span>{`${addComma(item.price)}원`}</span>
+                  ) : ( 
                     <div>
                       <Tag>쿠폰가능</Tag>
-                      <span>{item.price}</span>
+                      <span>{`${addComma(item.price)}원`}</span>
                     </div> 
-                  ) : ( 
-                    <span>{item.price}</span>
                   )}
                 </td>
                 <td>
