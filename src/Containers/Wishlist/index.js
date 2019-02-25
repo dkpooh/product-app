@@ -9,7 +9,9 @@ const WishList = ({
   wishItems, coupons, selectedWishItems, isChecked,
   onChangeCheckAll, onChangeCheck, onChagneQuantity, onChangeCoupon,
 }) => {
-  const checkedItem = _.filter(wishItems, (i) => { return (i.isChecked === true);});
+  // const checkedItem = _.filter(wishItems, (i) => { return (i.isChecked === true);});
+  const checkedItem = wishItems.filter((i) => {return i.isChecked === true;});
+  console.log(checkedItem);
   const count = checkedItem.length;
   const total = Math.floor(_.sum(checkedItem.map((item) => {
     switch(item.type) {
