@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Controller from '../Controller.js';
-import _ from 'lodash';
 import { Content, Title, Table, Tag } from '../styled.js';
 import { Total, Coupon, Price, SalePrice } from './styled.js';
 import { addComma } from '../utils.js';
@@ -8,21 +7,9 @@ import { addComma } from '../utils.js';
 const WishList = ({
   wishItems, coupons, selectedWishItems, isChecked,
   onChangeCheckAll, onChangeCheck, onChagneQuantity, onChangeCoupon,
+  calPrice, totalPrice, calSalePrice, totalCalSalePrice
 }) => {
-  // const checkedItem = _.filter(wishItems, (i) => { return (i.isChecked === true);});
-  const checkedItem = wishItems.filter((i) => {return i.isChecked === true;});
-  console.log(checkedItem);
-  const count = checkedItem.length;
-  const total = Math.floor(_.sum(checkedItem.map((item) => {
-    switch(item.type) {
-      case 'rate':
-        return Number(item.quantity) * Number(item.price) * 0.9;
-      case 'amount':
-        return Number(item.quantity) * Number(item.price) - 10000;
-      default:
-        return Number(item.quantity) * Number(item.price);
-    }
-  })));
+  const checkedItem = wishItems.filter((i) => {return i.isChecked === true;}); 
   return (
     <Content>
       <Title>장바구니</Title>
@@ -48,58 +35,58 @@ const WishList = ({
           </tr>
         </thead>
         <tbody>
-          {_.isEmpty(wishItems) ? (
-            <tr>
-              <td colSpan="7">장바구니가 비었습니다.</td>
-            </tr>
-          ) : (
-            wishItems.map((item, index) => {
-              return (
-                <tr key={index}>
-                  <td><input type="checkbox" value={item.id} checked={item.isChecked} onChange={(e) => {onChangeCheck(e, index)}} /></td>
-                  <td>{item.title}</td>
-                  <td><img src={item.coverImage} width="100%" /></td>
-                  <td><input type="number" id={item.id} name="quantity" min="1" max="10" value={item.quantity || 1} onChange={(e) => {onChagneQuantity(e, index)}} /></td>
-                  <td>
-                    {item.availableCoupon === false ? ( 
-                      <span>{`${addComma(item.price)}원`}</span>
-                    ) : ( 
-                      <div>
-                        <Tag>쿠폰가능</Tag>
+          {wishItems && wishItems.length > 0 ? (
+              wishItems.map((item, index) => {
+                return (
+                  <tr key={index}>
+                    <td><input type="checkbox" value={item.id} name="isChecked" checked={item.isChecked} onChange={(e) => {onChangeCheck(e, index)}} /></td>
+                    <td>{item.title}</td>
+                    <td><img src={item.coverImage} width="100%" /></td>
+                    <td><input type="number" id={item.id} name="quantity" min="1" max="10" value={item.quantity || 1} onChange={(e) => {onChagneQuantity(e, index)}} /></td>
+                    <td>
+                      {item.availableCoupon === false ? ( 
                         <span>{`${addComma(item.price)}원`}</span>
-                      </div> 
-                    )}
-                  </td>
-                  <td>
-                    {item.availableCoupon === false ? (
-                      <div>X</div>
-                    ) : (
-                      <select id={item.id} value={item.type} onChange={(e) => {onChangeCoupon(e, index)}}>
-                        <option>쿠폰을 선택해주세요</option>
-                        {coupons.map((item, index) => {
-                          return <option key={index} id={item.id} value={item.type}>{item.title}</option>
-                        })}
-                      </select>
+                      ) : ( 
+                        <div>
+                          <Tag>쿠폰가능</Tag>
+                          <span>{`${addComma(item.price)}원`}</span>
+                        </div> 
                       )}
-                  </td>
-                  <td>
-                    <p>
-                      {item.type === 'rate' ? addComma((Number(item.quantity) * Number(item.price) * 0.9)) : item.type === 'amount' ? addComma((Number(item.quantity) * Number(item.price) - 10000)) : addComma(Number(item.quantity) * Number(item.price))}원
-                    </p>
-                    <SalePrice>
-                      {item.type === 'rate' ?<span>{`(-${addComma((Number(item.quantity) * Number(item.price) * 0.1))})`}</span> : item.type === 'amount' ? <span>{`(-${addComma(10000)})`}</span> : ''}
-                    </SalePrice>
-                  </td>
-                </tr>
-              )
-            })
+                    </td>
+                    <td>
+                      {item.availableCoupon === false ? (
+                        <div>X</div>
+                      ) : (
+                        <select id={item.id} name="type" value={item.type} onChange={(e) => {onChangeCoupon(e, index)}}>
+                          <option>쿠폰을 선택해주세요</option>
+                          {coupons.map((item, index) => {
+                            return <option key={index} id={item.id} value={item.type}>{item.title}</option>
+                          })}
+                        </select>
+                        )}
+                    </td>
+                    <td>
+                      <p>
+                        {`${addComma(calPrice(item))}원`}
+                      </p>
+                      <SalePrice>
+                        <span>{addComma(calSalePrice(item))}</span>
+                      </SalePrice>
+                    </td>
+                  </tr>
+                )
+              })
+            ) : (
+              <tr>
+                <td colSpan="7">장바구니가 비었습니다.</td>
+              </tr>
           )}
         </tbody>
       </Table>
       <Total> 
         <Price>
           <h3>예상 결제금액 : </h3>
-          <span>{`${addComma(total)}원`}</span>
+          <span>{`${addComma(totalPrice(checkedItem))}원`}</span>
         </Price>
       </Total>
     </Content>

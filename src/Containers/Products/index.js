@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import Controller from '../Controller.js';
 import { Content, Title, Table, Tag } from '../styled.js';
 import { BtnWrap, PageWrap } from './styled.js';
