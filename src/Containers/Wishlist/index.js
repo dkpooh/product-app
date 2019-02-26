@@ -25,7 +25,7 @@ const WishList = ({
         </colgroup>
         <thead>
           <tr>
-            <th><input type="checkbox" value="all" onChange={onChangeCheckAll} /></th>
+            <th><input type="checkbox" value="all" checked={checkedItem.length === wishItems.length ? true : false} onChange={onChangeCheckAll} /></th>
             <th>상품 제목</th>
             <th>상품 사진</th>
             <th>수량</th>
