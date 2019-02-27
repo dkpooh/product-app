@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
-import update from 'immutability-helper';
 
 const Controller = WrappedComponent => class extends Component {
   constructor(props) {
@@ -118,13 +116,12 @@ const Controller = WrappedComponent => class extends Component {
         }
       ],
       wishItems: JSON.parse(localStorage.getItem("wishItems")) || [],
-      selectedWishItems: [],
     };
   }
   componentDidMount() {
-    const newItems =_.reverse(_.sortBy(this.state.items, [(i) => { return i.score; }]));    
+    const newItems = this.state.items.sort((a, b) => {return b["score"] - a["score"];});
     this.setState({
-      items: update(this.state.items, {$set: newItems}),
+      items: newItems,
     }, () => {
       this.onChangePage(this.state.current);
     });
@@ -135,29 +132,32 @@ const Controller = WrappedComponent => class extends Component {
       alert("장바구니는 최대 3개만 담을 수 있어요!!");
       return;
     }
-    const isIncludes = _.filter(this.state.wishItems, (i) => { return (i.id === item.id);}).length > 0;
+    const isIncludes = this.state.wishItems.filter((i) => (i.id === item.id)).length > 0;
     if (!isIncludes) {
-      const wishItems = update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true, quantity: 1, type: ''})]});
+      const wishItems = [...this.state.wishItems, {...item, isChecked: true, quantity: 1, type: ''}];
       localStorage.setItem("wishItems", JSON.stringify(wishItems));
       this.setState({
-        wishItems: update(this.state.wishItems, {$push: [_.merge(item, {isChecked: true, quantity: 1, type: ''})]}),
+        wishItems: wishItems,
       })
     }
   }
 
   removeWishList = (e, item) => {
-    const index = (_.findIndex(this.state.wishItems, (i) => { return i.id === item.id; }));
-    const wishItems = update(this.state.wishItems, {$splice: [[index, 1]]});
+    const index = this.state.wishItems.findIndex((i) => i.id === item.id);
+    const wishItems = [
+      ...this.state.wishItems.slice(0, index),
+      ...this.state.wishItems.slice(index + 1)
+    ];
     localStorage.setItem("wishItems", JSON.stringify(wishItems));
     this.setState({
-      wishItems: update(this.state.wishItems, {$splice: [[index, 1]]}),
+      wishItems: wishItems,
     }) 
   }
 
   onChangePage = (page) => {
     this.setState({
       current: page,
-      currentItems: update(this.state.currentItems, {$set: _.slice(this.state.items, [(page - 1) * 5], [page * 5])}),
+      currentItems: [...this.state.items.slice((page - 1) * 5, page * 5)]
     });
   }
 
@@ -165,7 +165,7 @@ const Controller = WrappedComponent => class extends Component {
     let wishItems = this.state.wishItems;
     wishItems.forEach(item => item.isChecked = e.target.checked) 
     this.setState({ 
-      wishItems: wishItems 
+      wishItems: wishItems,
     });
   }
 
@@ -173,7 +173,14 @@ const Controller = WrappedComponent => class extends Component {
     const target = e.target;
     if (this.state.wishItems[idx].id === target.value) {
       this.setState({
-        wishItems: update(this.state.wishItems, {[idx]: {isChecked: {$set: target.checked}}})
+        wishItems: [
+          ...this.state.wishItems.slice(0, idx),
+          {
+            ...this.state.wishItems[idx],
+            [target.name]: target.checked
+          },
+          ...this.state.wishItems.slice(idx + 1)
+        ]
       })
     }
   }
@@ -182,7 +189,14 @@ const Controller = WrappedComponent => class extends Component {
     const target = e.target;
     if (this.state.wishItems[idx].id === target.id) {
       this.setState({
-        wishItems: update(this.state.wishItems, {[idx]: {type: {$set: target.value}}})
+        wishItems: [
+          ...this.state.wishItems.slice(0, idx),
+          {
+            ...this.state.wishItems[idx],
+            [target.name]: target.value
+          },
+          ...this.state.wishItems.slice(idx + 1)
+        ]
       })
     }
   }
@@ -191,11 +205,50 @@ const Controller = WrappedComponent => class extends Component {
     const target = e.target;
     if (this.state.wishItems[idx].id === target.id) {
       this.setState({
-        wishItems: update(this.state.wishItems, {[idx]: {quantity: {$set: target.value}}})
+        wishItems: [
+          ...this.state.wishItems.slice(0, idx),
+          {
+            ...this.state.wishItems[idx],
+            [target.name]: target.value
+          },
+          ...this.state.wishItems.slice(idx + 1)
+        ]
       })
     }
   }
   
+  calPrice = (item) => {
+    let price;
+    switch(item.type) {
+      case 'rate':
+        return price = Number(item.quantity) * Number(item.price) * (100 - (this.state.coupons.find((o) => { return o.type === 'rate' }).discountRate)) / 100;
+      case 'amount':
+        return price = Number(item.quantity) * Number(item.price) - this.state.coupons.find((o) => { return o.type === 'amount' }).discountAmount;
+      default:
+        return price = Number(item.quantity) * Number(item.price);
+    }
+  }
+
+  totalPrice = (items) => {
+    let arr = [];
+    items.forEach(item => { 
+      arr.push(this.calPrice(item));
+    });
+    return arr.reduce((a, b) => a + b, 0);
+  }
+
+  calSalePrice = (item) => {
+    let price;
+    switch(item.type) {
+      case 'rate':
+        return price = `(-${Number(item.quantity) * Number(item.price) * (this.state.coupons.find((o) => { return o.type === 'rate' }).discountRate) / 100})`;
+      case 'amount':
+        return price = `(-${this.state.coupons.find((o) => { return o.type === 'amount' }).discountAmount})`;
+      default:
+        return '';
+    }
+  }
+
   render() {
     return (
       <WrappedComponent
@@ -208,6 +261,10 @@ const Controller = WrappedComponent => class extends Component {
         onChangeCheck={this.onChangeCheck}
         onChagneQuantity={this.onChagneQuantity}
         onChangeCoupon={this.onChangeCoupon}
+        calPrice={this.calPrice}
+        totalPrice={this.totalPrice}
+        calSalePrice={this.calSalePrice}
+        totalCalSalePrice={this.totalCalSalePrice}
       />
     ) 
   }

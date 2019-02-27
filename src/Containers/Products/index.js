@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import Controller from '../Controller.js';
 import { Content, Title, Table, Tag } from '../styled.js';
 import { BtnWrap, PageWrap } from './styled.js';
@@ -31,7 +30,7 @@ const Products = ({
         </thead>
         <tbody>
           {currentItems.map((item, index) => {
-            const isIncludes = _.filter(wishItems, (i) => { return (i.id === item.id);}).length > 0;
+            const isIncludes = wishItems.filter((i) => (i.id === item.id)).length > 0;
             return (
               <tr key={index}>
                 <td>{item.title}</td>
