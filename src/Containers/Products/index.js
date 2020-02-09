@@ -29,10 +29,10 @@ const Products = ({
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item, index) => {
+          {currentItems.map((item, key) => {
             const isIncludes = wishItems.filter((i) => (i.id === item.id)).length > 0;
             return (
-              <tr key={index}>
+              <tr key={key}>
                 <td>{item.title}</td>
                 <td><img src={item.coverImage} width="100%" /></td>
                 <td>
@@ -48,9 +48,9 @@ const Products = ({
                 <td>
                   <BtnWrap>
                     {isIncludes ? ( 
-                        <button onClick={(e) => removeWishList(e, item)}>빼기</button> 
+                        <button onClick={() => removeWishList(item.id)}>빼기</button> 
                       ) : ( 
-                        <button onClick={(e) => addWishList(e, item)}>담기</button>
+                        <button onClick={() => addWishList(item.id)}>담기</button>
                     )}
                   </BtnWrap>
                 </td>

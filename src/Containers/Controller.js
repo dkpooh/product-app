@@ -127,31 +127,47 @@ const Controller = WrappedComponent => class extends Component {
     });
   }
 
-  addWishList = (e, item) => {
-    if (this.state.wishItems.length === 3) {
-      alert("장바구니는 최대 3개만 담을 수 있어요!!");
-      return;
-    }
-    const isIncludes = this.state.wishItems.filter((i) => (i.id === item.id)).length > 0;
-    if (!isIncludes) {
-      const wishItems = [...this.state.wishItems, {...item, isChecked: true, quantity: 1, type: ''}];
-      localStorage.setItem("wishItems", JSON.stringify(wishItems));
-      this.setState({
-        wishItems: wishItems,
-      })
-    }
+  addWishList = (id) => {
+    // if (this.state.wishItems.length === 3) {
+    //   alert("장바구니는 최대 3개만 담을 수 있어요!!");
+    //   return;
+    // }
+    // const isIncludes = this.state.wishItems.filter((i) => (i.id === item.id)).length > 0;
+    // if (!isIncludes) {
+    //   const wishItems = [...this.state.wishItems, {...item, isChecked: true, quantity: 1, type: ''}];
+    //   localStorage.setItem("wishItems", JSON.stringify(wishItems));
+    //   this.setState({
+    //     wishItems: wishItems,
+    //   })
+    // }
+
+    let arr = []
+    this.state.items.map(item => {
+      if (item.id === id) {
+        arr.push({...item, isChecked: true, quantity: 1, type: ''})
+      }
+    })
+
+    this.setState(prevState => {
+      // const newWishItems = [...prevState.wishItems, ...arr]
+
+      localStorage.setItem("wishItems", JSON.stringify(arr));
+
+      return {
+        wishItems: arr
+      }
+    })
   }
 
-  removeWishList = (e, item) => {
-    const index = this.state.wishItems.findIndex((i) => i.id === item.id);
-    const wishItems = [
-      ...this.state.wishItems.slice(0, index),
-      ...this.state.wishItems.slice(index + 1)
-    ];
-    localStorage.setItem("wishItems", JSON.stringify(wishItems));
-    this.setState({
-      wishItems: wishItems,
-    }) 
+  removeWishList = (id) => {    
+    this.setState(prevState => {
+      const newWishItems = prevState.wishItems.filter((item) => item.id !== id )
+      localStorage.setItem("wishItems", JSON.stringify(newWishItems));
+
+      return {
+        wishItems: newWishItems
+      }
+    })
   }
 
   onChangePage = (page) => {
